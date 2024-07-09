@@ -1,0 +1,34 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: docker_demo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+
+  django:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./django_docker_demo:/code
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DB: docker_demo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_HOST: db
+      POSTGRESS_PORT: 5432
